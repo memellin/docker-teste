@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: ./fardim-tintas-catalogo
+    ports:
+      - "5500:80" # Porta do host:porta do container
+    networks:
+      - app-network
+
+  backend:
+    build: ./crud-spring
+    ports:
+      - "8080:8080" # Porta do host:porta do container
+    networks:
+      - app-network
+    depends_on:
+      - db # Dependência do serviço backend, famoso banco de dados
+    volumes:
+      - /f/path/to/images:/app/images  # Caminho absoluto no host convertido para formato Docker
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Volume para persistência de dados
+    ports:
+      - "5432:5432"	
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge
